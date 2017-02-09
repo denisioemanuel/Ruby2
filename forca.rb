@@ -1,4 +1,5 @@
 require_relative 'ui'
+require_relative 'ranck'
 
 def pede_um_chute_valido chutes, erros, mascara
 	cabecalho_de_tentativas chutes, erros, mascara
@@ -10,6 +11,25 @@ def pede_um_chute_valido chutes, erros, mascara
 			return chute
 		end 
 	end
+end
+
+def sorteia_palavra_secreta
+	avisa_escolhendo_palavra
+	dicionario = File.read("dicionario.txt")
+	todas_as_palavras = dicionario.split("\n")
+	numero_aleatorio = rand(todas_as_palavras.size)
+	palavra_secreta = todas_as_palavras[numero_aleatorio].downcase
+	avisa_palavra_escolhida palavra_secreta
+end
+
+def salva_rack(nome, pontos)
+	conteudo = "#{nome}\n#{pontos}"
+	File.write("ranck.txt",conteudo)
+end
+
+def le_ranck
+	conteudo_atual = File.read("ranck.txt")
+	dados = conteudo_atual.split("\n")	
 end
 
 def joga(nome)
@@ -49,13 +69,26 @@ def joga(nome)
 	end
 
 	avisa_pontos_ate_agora pontos_ate_agora
+	pontos_ate_agora
 end
 
 def jogo_da_forca
 	nome = da_boas_vindas
+	pontos_totais = 0
+
+	avisa_campeao_atual le_ranck
 
 	loop do
-		joga nome
+		pontos_totais += joga nome
+		avisa_pontos_totais pontos_totais
+		salva_rack nome, pontos_totais
+
+		if le_ranck[1].to_i < pontos_totais
+			salva_rack nome, pontos_totais
+		end
+
 		break if nao_quero_jogar?
 	end
 end
+
+jogo_da_forca
